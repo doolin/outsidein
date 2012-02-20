@@ -115,9 +115,9 @@ Feature: User manages books
 
 # We have no steps...
 
-<dl>
-<dt>$ cucumber</dt>  
-<dd>
+
+`$ cucumber`
+
 We have no steps.
 Solution: Add file <code>features/step_definitions/book_steps.rb</code>, and copy in the output:
 
@@ -143,12 +143,12 @@ Then /^I should see "([^"]*)"$/ do |arg1|
   pending # express the regexp above with the code you wish you had
 end
 ~~~~
-</dd>
+
 
 # Add action to node...
 
-<dt>$ cucumber</dt>  
-<dd>
+`$ cucumber`
+
 
 ~~~~
 @@@ sh 
@@ -171,36 +171,52 @@ Given /^I go to the new book page$/ do
   visit new_book_path
 end
 ~~~~
-</dd>
+
 
 # Routing helps...
 
-<dt>$ cucumber</dt>  
-<dd>
+`$ cucumber`
+
 We're failing at the first step of the scenario: <code>undefined local variable or method `new_book_path' for #<Cucumber::Rails::World:0x00000102ceac68> (NameError).</code>
+
 Solution: Add <code>resources :books</code> to <code>config/routes.rb</code>.
 
-While we're at it, go ahead and add a root path, this will be helpful later: <code>root :to => 'books#index'</code>.
-</dd>
+While we're at it, go ahead and add a root path, this will be helpful 
+later: `root :to => 'books#index'`.
 
-<dt>$ cucumber</dt>  
-<dd>
+
+# A route wants a controller...
+
+`$ cucumber`
+
+
 Failing again: <code>uninitialized constant BooksController (ActionController::RoutingError)</code> 
+
+
 Solution: Add the controller file app/controllers/books_controller.rb
-<pre>
+
+~~~~
+@@@ ruby
 class BooksController < ApplicationController
 end
-</pre>
+~~~~
 
-<dt>$ cucumber</dt>
-<dd>Failing again: <code>The action 'new' could not be found for BooksController (AbstractController::ActionNotFound)</code>
+# And controllers want actions
+
+`$ cucumber`
+
+Failing again: <code>The action 'new' could not be found for 
+BooksController (AbstractController::ActionNotFound)</code>
+
 Solution: Add the <code>new</code> method:
-<pre lang="ruby">
+
+~~~~
+@@@ ruby
 class BooksController < ApplicationController
   def new
   end
 end
-</pre>
+~~~~
 
 
 # Templates help too...
@@ -208,11 +224,15 @@ end
 
 <dt>$ cucumber</dt>
 <dd>Yikes! <code>Missing template books/new with {:handlers=>[:erb, :rjs, :builder, :rhtml, :rxml], :formats=>[:html], :locale=>[:en, :en]} in view paths "/Users/daviddoolin/src/bdd/app/views" (ActionView::MissingTemplate)</code>
-<pre lang="bash">
+
+~~~~
+@@@ sh 
 $ mkdir app/views/books
 $ vi app/views/books/new.html.erb
-</pre>
+~~~~
+
 Just stick an <code>h2</code> in that file or something.
+
 </dd>
 
 <dt>$ cucumber</dt>
@@ -229,15 +249,17 @@ One down, four to go.
 
 Cucumber now fails on the second step:
 
-<dl>
-<dt>$ cucumber</dt> 
-<dd>
-<pre lang="sh">
-    And I fill in "Name" with "War & Peace" # features/step_definitions/book_steps.rb:5
-      TODO (Cucumber::Pending)
-      ./features/step_definitions/book_steps.rb:6:in `/^I fill in "([^"]*)" with "([^"]*)"$/'
-      features/book.feature:4:in `And I fill in "Name" with "War & Peace"'
-</pre>
+
+`$ cucumber`
+
+~~~~
+@@@ sh
+And I fill in "Name" with "War & Peace" # features/step_definitions/book_steps.rb:5
+  TODO (Cucumber::Pending)
+  ./features/step_definitions/book_steps.rb:6:in `/^I fill in "([^"]*)" with "([^"]*)"$/'
+  features/book.feature:4:in `And I fill in "Name" with "War & Peace"'
+~~~~
+
 Solution: add the <a href="https://github.com/jnicklas/capybara/blob/master/lib/capybara/node/actions.rb#L48">Capybara `fill_in` matcher</a>:
 
 ~~~~
@@ -269,9 +291,11 @@ Solution: Add a form to the new book page:
 
 # Rails is very unhappy
 
-<dt>$ cucumber</dt>
-<dd>
+`$ cucumber`
+
 Massive FAIL! <code>undefined method `model_name' for NilClass:Class (ActionView::Template::Error)</code>
+
+
 Solution: Add instance variable to make Rails happy. <code>In app/controllers/books_controller.rb</code>, add <code>@book = Book.new</code>, like so:
 
 ~~~~
@@ -281,18 +305,19 @@ Solution: Add instance variable to make Rails happy. <code>In app/controllers/bo
   end
 ~~~~
 
-</dd>
-
 
 # Instances prefer objects
 
 <dt>$ cucumber</dt>
 <dd>
 Failing on <code>uninitialized constant BooksController::Book (NameError)</code>
+
 Solution: Add model to make Rails happy: 
-<pre>
+
+~~~~
+@@@ sh
 $ vi app/models/book.rb
-</pre>
+~~~~
 
 Make it look like this:
 
@@ -375,49 +400,66 @@ end
 
 # Controllers love actions
 
-<dt>$ cucumber</dt>
-<dd>
+`$ cucumber`
+
 cucumber fails on action 'create': <code>The action 'create' could not be found for BooksController (AbstractController::ActionNotFound)</code>
+
 Solution: Add the create method to the books controller:
-<pre>
-  def create
-  end
-</pre>
-</dd>
+
+~~~~
+@@@ ruby 
+def create
+end
+~~~~
+
 
 # Another dang template
 
-<dt>$ cucumber</dt>
-<dd>
+`$ cucumber`
+
 Failing again on templates: <code>Missing template books/create with {:handlers=>[:erb</code>
-Solution: Let's go ahead and redirect this to the root_path:
-<pre>
+
+Solution: We don't really want a "create" template, so 
+let's go ahead and redirect this to the root_path for now:
+
+~~~~
+@@@ ruby
 def create
   redirect_to books_path       
 end
-</pre>
-</dd><dd>
+~~~~
 
-<dt>$ cucumber</dt>
-</dd><dd>
+
+
+
+`$ cucumber`
+
 Failing and failing and failing: <code>The action 'index' could not be found for BooksController</code>.
+
 Solution: Open <code>app/controllers/books_controller.rb</code>, add
-<pre>
+
+~~~~
+@@@ ruby
 def index
 end
-</pre>
-</dd>
+~~~~
 
-<dt>$ cucumber</dt>
-<dd>
+
+# An index action wants for an index template
+
+`$ cucumber`
+
 Bummer: <code>Missing template books/index with {:handlers=>[:erb</code>.
+
 Solution: Add app/views/books/index.html.erb:
+
 <pre>
 &lt;h2>List books&lt;/h2>
 </pre>
-</dd>
 
-<dt>$ cucumber</dt>
+## Run it again to pass
+
+`$ cucumber`
 
 
 Step 3 now passes cucumber.  Onward, through the fog.
@@ -492,15 +534,19 @@ end
 </pre>
 </dd>
 
-# Rendering a partial requires a partial
+# Rendering a partial requires... a partial
 
-<dd>
+`$ cucumber`
+
 Still failing... <code>Missing partial books/book with {:handlers=>[:erb,</code>.
+
 Solution: Add the partial <code>app/views/books/_book.html.erb</code>
-<pre>
+
+~~~~
+@@@ ruby
 < %= book.name %><br />
-</pre>
-</dd>
+~~~~
+
 
 
 # Time to actually create the book...
@@ -508,6 +554,7 @@ Solution: Add the partial <code>app/views/books/_book.html.erb</code>
 <dt>$ cucumber</dt>
 <dd>
 <code>expected #has_content?("War & Peace") to return true, got false </code>
+
 Solution: We're almost done, add a little bit of code to the book controller's <code>create</code> method:
 
 ~~~~

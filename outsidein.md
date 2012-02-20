@@ -222,8 +222,9 @@ end
 # Templates help too...
 
 
-<dt>$ cucumber</dt>
-<dd>Yikes! <code>Missing template books/new with {:handlers=>[:erb, :rjs, :builder, :rhtml, :rxml], :formats=>[:html], :locale=>[:en, :en]} in view paths "/Users/daviddoolin/src/bdd/app/views" (ActionView::MissingTemplate)</code>
+`$ cucumber`
+
+<code>Missing template books/new with {:handlers=>[:erb, :rjs, :builder, :rhtml, :rxml], :formats=>[:html], :locale=>[:en, :en]} in view paths "/Users/daviddoolin/src/bdd/app/views" (ActionView::MissingTemplate)</code>
 
 ~~~~
 @@@ sh 
@@ -233,15 +234,13 @@ $ vi app/views/books/new.html.erb
 
 Just stick an <code>h2</code> in that file or something.
 
-</dd>
+## Run it again to pass
 
-<dt>$ cucumber</dt>
-<dd>
+`$ cucumber`
+
 Passed!  
 
 One down, four to go.  
-</dd>
-</dl>
 
 
 # Step 2: And I fill in "Name" with "War & Peace"
@@ -269,13 +268,13 @@ Given /^I fill in "([^"]*)" with "([^"]*)"$/ do |arg1, arg2|
 end
 ~~~~
 
-</dd>
 
 
 # Forms are very helpful
 
-<dt>$ cucumber</dt> 
-<dd>Fails: <code>cannot fill in, no text field, text area or password field with id, name, or label 'Name' found (Capybara::ElementNotFound)</code>
+`$ cucumber`
+
+Fails: <code>cannot fill in, no text field, text area or password field with id, name, or label 'Name' found (Capybara::ElementNotFound)</code>
 
 Solution: Add a form to the new book page:
 
@@ -287,7 +286,7 @@ Solution: Add a form to the new book page:
   <%= f.submit 'Create' %>
 <% end %>
 ~~~~
-</dd>
+
 
 # Rails is very unhappy
 
@@ -308,8 +307,8 @@ Solution: Add instance variable to make Rails happy. <code>In app/controllers/bo
 
 # Instances prefer objects
 
-<dt>$ cucumber</dt>
-<dd>
+`$ cucumber`
+
 Failing on <code>uninitialized constant BooksController::Book (NameError)</code>
 
 Solution: Add model to make Rails happy: 
@@ -326,12 +325,12 @@ Make it look like this:
 class Book < ActiveRecord::Base
 end
 ~~~~
-</dd>
+
 
 # Activate ActiveRecord
 
-<dt>$ cucumber</dt>
-<dd>
+`$ cucumber`
+
 Failing Step 1 again... <code>Could not find table 'books' (ActiveRecord::StatementInvalid)</code>
 
 Solution: First, create and edit a migration file:
@@ -370,22 +369,22 @@ And run the migration:
 
 
 Running cucumber again, we pass.  Excellent.
-</dd>
 
-</dl>
 
 # Step 3: When I press "Create"
 
-<dl>
-<dt>$ cucumber</dt>
-<dd>
+
+`$ cucumber`
+
 On to our next step:
-<pre lang="sh">
+
+~~~~
+@@@ sh 
 When I press "Create"                   # features/step_definitions/book_steps.rb:9
    TODO (Cucumber::Pending)
    ./features/step_definitions/book_steps.rb:10:in `/^I press "([^"]*)"$/'
    features/book.feature:5:in `When I press "Create"'
-</pre>
+~~~~
 
 Solution: add the <a href="https://github.com/jnicklas/capybara/blob/master/lib/capybara/node/actions.rb#L34">Capybara `click_button` matcher</a>:
 
@@ -396,7 +395,7 @@ When /^I press "([^"]*)"$/ do |arg1|
 end
 ~~~~
 
-</dd>
+
 
 # Controllers love actions
 
@@ -453,9 +452,10 @@ Bummer: <code>Missing template books/index with {:handlers=>[:erb</code>.
 
 Solution: Add app/views/books/index.html.erb:
 
-<pre>
-&lt;h2>List books&lt;/h2>
-</pre>
+~~~~
+@@@ html
+<h2>List books</h2>
+~~~~
 
 ## Run it again to pass
 
@@ -496,36 +496,50 @@ And that passes Step 4.
 
 # Step 5: And I should see "War & Peace"
 
-<dl>
 
 
-<dt>$ cucumber</dt>
-<dd>
-<pre lang="sh">
+`$ cucumber`
+
+
+~~~~
+@@@ sh
 And I should see "War & Peace"       # features/step_definitions/book_steps.rb:17
   TODO (Cucumber::Pending)
   ./features/step_definitions/book_steps.rb:18:in `/^I should see "([^"]*)"$/'
   features/book.feature:7:in `And I should see "War & Peace"'
-</pre>
+~~~~
+
 Time to fill in for the next step, this time with a matcher:
-<pre lang="ruby">
+
+~~~~
+@@@ ruby
 Then /^I should see "([^"]*)"$/ do |arg1|
   page.should have_text(arg1)
 end
-</pre>
-</dd>
+~~~~
 
-<dt>$ cucumber</dt>
-<dd>
+
+# Still not seeing any books
+
+`$ cucumber`
+
 Not seeing books: <code>expected there to be text "War & Peace" in "List books" </code>.
-Solution: Render the book list:
-<pre>
-$vi app/views/books/index.html.erb
 
-&lt;h2>List books&lt;/h2>
+Solution: Render the book list. First, open the template file:
+
+~~~~
+@@@ sh
+$vi app/views/books/index.html.erb
+~~~~
+
+Now render the books:
+
+~~~~
+@@@ ruby
+<h2>List books</h2>
   <%= render @books %>
-</pre>
-</dd>
+~~~~
+
 
 
 # Need an instance array of books
@@ -561,8 +575,8 @@ Solution: Add the partial <code>app/views/books/_book.html.erb</code>
 
 # Time to actually create the book...
 
-<dt>$ cucumber</dt>
-<dd>
+`$ cucumber`
+
 <code>expected #has_content?("War & Peace") to return true, got false </code>
 
 Solution: We're almost done, add a little bit of code to the book controller's <code>create</code> method:
@@ -610,11 +624,10 @@ We're done.
 ## And that's a wrap
 
 Notes:
-<ul>
-<li>RSpec only for matchers. In the future (2013?), Capybara matchers may be sufficient.</li>
-<li>All custom step definitions, no <code>web_steps.rb</code> matchers.
-</li>
-</ul>
+
+* RSpec only for matchers. In the future (2013?), Capybara matchers may be sufficient.
+* All custom step definitions, no <code>web_steps.rb</code> matchers.
+
 
 
 # Conclusion

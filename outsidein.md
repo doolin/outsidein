@@ -461,31 +461,35 @@ Solution: Add app/views/books/index.html.erb:
 
 `$ cucumber`
 
-
 Step 3 now passes cucumber.  Onward, through the fog.
 
 
 # Step 4: Then I should be on the book list page
 
-<dl>
+`$ cucumber`
 
-<dt>$ cucumber</dt>
-<dd>
-<pre lang="sh">
+~~~~
+@@@ sh
 Then I should be on the book list page  # features/step_definitions/book_steps.rb:13
   TODO (Cucumber::Pending)
   ./features/step_definitions/book_steps.rb:14:in `/^I should be on the book list page$/'
   features/book.feature:6:in `Then I should be on the book list page'
-</pre>
+~~~~
+
 Time to fill in for the next step, this time with a matcher:
-<pre lang="ruby">
+
+~~~~
+@@@ ruby
 Then /^I should be on the book list page$/ do
   page.should have_text('List books')
 end
-</pre>
-</dd>
+~~~~
 
-And that passes Step 4 (for now).
+## Run it again to pass
+
+`$ cucumber`
+
+And that passes Step 4.
 
 </dl>
 
@@ -523,16 +527,22 @@ $vi app/views/books/index.html.erb
 </pre>
 </dd>
 
-<dt>$ cucumber</dt>
-<dd>
-Wooo... <code>undefined method `model_name' for NilClass:Class (ActionView::Template::Error)</code>.
+
+# Need an instance array of books
+
+`$ cucumber`
+
+<code>undefined method `model_name' for NilClass:Class (ActionView::Template::Error)</code>.
+
 Solution: Grab the list of books:
-<pre>
+
+~~~~
+@@@ ruby
 def index
   @books = Book.all
 end
-</pre>
-</dd>
+~~~~
+
 
 # Rendering a partial requires... a partial
 
@@ -544,7 +554,7 @@ Solution: Add the partial <code>app/views/books/_book.html.erb</code>
 
 ~~~~
 @@@ ruby
-< %= book.name %><br />
+<%= book.name %><br />
 ~~~~
 
 
@@ -590,13 +600,14 @@ class BooksController < ApplicationController
 end
 ~~~~
 
-</dd>
 
-</dl>
+# Run it again to pass
 
+`$ cucumber`
 
+We're done.
 
-# And that's a wrap
+## And that's a wrap
 
 Notes:
 <ul>
@@ -623,7 +634,7 @@ This isn't the only way to do this. Here are more references on the same topic:
 If you have an article you believe should be linked, let me know in the comments and I'll add it in.
 
 
-Overall, this was a lot of work.  But there's more which could be done.  For example, deleting the <code>web_steps.rb</code> file, which is matching all the lines in the scenario, would force us to write our own matchers, and handle the testing code ourselves.
+Overall, this was a lot of work.  But there's more which could be done.  For example:
 
 <strong>The entire project could be rewritten in RSpec alone, save the feature file.</strong>
 

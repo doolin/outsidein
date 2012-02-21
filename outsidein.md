@@ -18,7 +18,14 @@ But there are some differences.  Here, we start with a bare Rails application. T
 
 Here, we have a user adding a new book title to a list of book titles. That's all the information necessary to build out and test with Cucumber.
 
+## Assumptions
 
+I'm using the following setup:
+
+ * ruby 1.9.3-p0
+ * rails 3.2.1
+ * Gemfile to follow...
+ 
 # Setting it up
 
 First up, create your new Rails code:
@@ -29,7 +36,19 @@ $ rails new outsidein
 $ cd outsidein
 ~~~~
 
-Add <code>cucumber-rails</code> and <code>database_cleaner</code> 
+## OpenSSL error
+
+If bundler segfaults, this is most likely a
+problem with the `openssl` library which it 
+was compiled against. 
+
+For now, change the source argument from `https` to
+`http` in the Gemfile
+
+
+# Building the Gemfile
+
+Add <code>cucumber-rails</code>, `rspec` and <code>database_cleaner</code> 
 to <code>:development</code> and <code>:test</code> groups in your Gemfile:
 
   
@@ -37,12 +56,15 @@ to <code>:development</code> and <code>:test</code> groups in your Gemfile:
 @@@ ruby
 source 'http://rubygems.org'
 
-gem 'rails'
+gem 'rails', '3.2.1'
 gem 'sqlite3'
 
-gem 'sass-rails'
-gem 'coffee-script'
-gem 'uglifier'
+group :assets do
+  gem 'sass-rails'
+  gem 'coffee-script' 
+  gem 'uglifier'
+end
+
 gem 'jquery-rails'
 
 group :test, :development do
@@ -232,7 +254,13 @@ $ mkdir app/views/books
 $ vi app/views/books/new.html.erb
 ~~~~
 
-Just stick an <code>h2</code> in that file or something.
+Just stick an `h1` in that file or something:
+
+~~~~
+@@@ html
+<h1>New book page<h1>
+~~~~
+
 
 ## Run it again to pass
 
@@ -309,9 +337,9 @@ Solution: Add instance variable to make Rails happy. <code>In app/controllers/bo
 
 `$ cucumber`
 
-Failing on <code>uninitialized constant BooksController::Book (NameError)</code>
+Failing on <code>uninitialized constant BooksController::Book (NameError)</code>.
 
-Solution: Add model to make Rails happy: 
+Solution: This is a somewhat confusing error messge, we need a model to make Rails happy:
 
 ~~~~
 @@@ sh
@@ -429,7 +457,7 @@ end
 ~~~~
 
 
-
+# Handle the index action...
 
 `$ cucumber`
 
@@ -481,7 +509,7 @@ Time to fill in for the next step, this time with a matcher:
 ~~~~
 @@@ ruby
 Then /^I should be on the book list page$/ do
-  page.should have_text('List books')
+  page.should have_content('List books')
 end
 ~~~~
 
@@ -568,7 +596,7 @@ Solution: Add the partial <code>app/views/books/_book.html.erb</code>
 
 ~~~~
 @@@ ruby
-<%= book.name %><br />
+<%= book.name %>
 ~~~~
 
 

@@ -42,7 +42,6 @@ Now, add `haml` and `rspec` to the Gemfile:
 source 'https://rubygems.org'
 
 gem 'rails', '3.2.1'
-gem 'sqlite3'
 gem 'haml-rails'
 gem 'jquery-rails'
 
@@ -53,12 +52,15 @@ group :assets do
 end
 
 group :development, :test do
+  gem 'sqlite3'
   gem 'rspec-rails'
   gem 'capybara'
   gem 'letter_opener'
   gem 'email_spec'
 end
 ~~~~
+
+We're moving the `sqlite3` gem into `:test` and `:development` groups to keep heroku cedar stack from sqawking at us.
 
 ## Don't forget to run the following:
 
@@ -69,6 +71,20 @@ $ rails generate rspec:install
 ~~~~
 
 
+# Do the git thing...
+
+Let's go ahead and do the obvious next:
+
+~~~~
+@@@ sh
+$ git init
+$ git add .
+$ git commit -m"first commit"
+~~~~
+
+We're going to need this next, when we fire up heroku.
+
+
 # Heroku because we're going there anyway, probably
 
 What we want a new application on the `celadon cedar` stack. 
@@ -76,6 +92,11 @@ What we want a new application on the `celadon cedar` stack.
 Do it like this:
 
 `heroku apps:create --stack cedar`
+
+New we can push to heroku: 
+
+`$ git push heroku master`
+
 
 
 # Test driving the email setup
@@ -87,13 +108,12 @@ We really want to do this test-first, but `rails generate` saves a lot of time a
 @@@ sh
 $ rails generate mailer AlertMailer pop
       create  app/mailers/alert_mailer.rb
-      invoke  erb
+      invoke  haml
       create    app/views/alert_mailer
-      create    app/views/alert_mailer/pop.text.erb
+      create    app/views/alert_mailer/pop.text.haml
       invoke  rspec
       create    spec/mailers/alert_mailer_spec.rb
       create    spec/fixtures/alert_mailer/pop
-$ mv app/views/alert_mailer/pop.text.erb app/views/alert_mailer/pop.text.haml 
 ~~~~
 
 # What is an "ActionMailer", anyway?
@@ -112,6 +132,8 @@ Not too difficult, but as usual, there are a lot of moving parts.
 
 
 # Starting into the email spec
+
+
 Here's what we get for the `alert_mailer_spec.rb`:
 
 ~~~~

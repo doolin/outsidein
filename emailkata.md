@@ -1,7 +1,5 @@
 # An Email Code Kata for Rails
 
-
-
 # Some background
 
 Sending emails from Rails isn't difficult, just takes a little practice to figure out and get working. 
@@ -18,6 +16,8 @@ Here is that practice, develped as a code kata.
 * Configure SMTP for Sendgrid
 * Drive out desired emails via test-first
 
+# Development operations first
+
 
 # Setting up
 
@@ -29,11 +29,7 @@ $ rm public/index.html
 ~~~~
 
 
-
-
 # Build out the Gemfile
-
-
 
 Now, add `haml` and `rspec` to the Gemfile:
 
@@ -87,7 +83,7 @@ We're going to need this next, when we fire up heroku.
 
 # Heroku because we're going there anyway, probably
 
-What we want a new application on the `celadon cedar` stack. 
+We want a new application on the `celadon cedar` stack. 
 
 Do it like this:
 
@@ -97,7 +93,17 @@ New we can push to heroku:
 
 `$ git push heroku master`
 
+# Building application email infrastructure
 
+
+# What we're driving for
+
+An application email infrastructure consists of the following:
+
+* Web pages (views) which have links or forms for sending emails
+* Web pages (views) which are redirect targets after email is sent
+* Email templates (mailers), what the user gets sent.
+* All the models, controllers, etc.
 
 # Test driving the email setup
 
@@ -116,6 +122,9 @@ $ rails generate mailer AlertMailer pop
       create    spec/fixtures/alert_mailer/pop
 ~~~~
 
+### `git add .; git commit -m"generated mailer files"`
+
+
 # What is an "ActionMailer", anyway?
 
 From the [Rails ActionMailer API description](http://api.rubyonrails.org/classes/ActionMailer/Base.html),
@@ -132,7 +141,6 @@ Not too difficult, but as usual, there are a lot of moving parts.
 
 
 # Starting into the email spec
-
 
 Here's what we get for the `alert_mailer_spec.rb`:
 
@@ -165,33 +173,180 @@ to use my real email address for testing it out. You should use your own.
 
 ~~~~
 @@@ sh
-$ rails generate controller AlertEmailer sender thankyou
-     create  app/controllers/alert_emailer_controller.rb
-       route  get "alert_emailer/thankyou"
-       route  get "alert_emailer/sender"
+$ rails generate controller AlertPages sender thankyou
+      create  app/controllers/alert_pages_controller.rb
+       route  get "alert_pages/thankyou"
+       route  get "alert_pages/sender"
       invoke  haml
-      create    app/views/alert_emailer
-      create    app/views/alert_emailer/sender.html.haml
-      create    app/views/alert_emailer/thankyou.html.haml
+      create    app/views/alert_pages
+      create    app/views/alert_pages/sender.html.haml
+      create    app/views/alert_pages/thankyou.html.haml
       invoke  rspec
-      create    spec/controllers/alert_emailer_controller_spec.rb
-      create    spec/views/alert_emailer
-      create    spec/views/alert_emailer/sender.html.haml_spec.rb
-      create    spec/views/alert_emailer/thankyou.html.haml_spec.rb
+      create    spec/controllers/alert_pages_controller_spec.rb
+      create    spec/views/alert_pages
+      create    spec/views/alert_pages/sender.html.haml_spec.rb
+      create    spec/views/alert_pages/thankyou.html.haml_spec.rb
       invoke  helper
-      create    app/helpers/alert_emailer_helper.rb
+      create    app/helpers/alert_pages_helper.rb
       invoke    rspec
-      create      spec/helpers/alert_emailer_helper_spec.rb
+      create      spec/helpers/alert_pages_helper_spec.rb
       invoke  assets
       invoke    coffee
-      create      app/assets/javascripts/alert_emailer.js.coffee
+      create      app/assets/javascripts/alert_pages.js.coffee
       invoke    scss
-      create      app/assets/stylesheets/alert_emailer.css.scss
+      create      app/assets/stylesheets/alert_pages.css.scss
 ~~~~
 
-## Bonus: why not `send` instead of `sender`?
 
 
+# Bonus: why not `send` instead of `sender`?
+
+Note we invoked generate with `sender` argument:
+
+`$ rails generate controller AlertPages sender thankyou`
+
+Why not `send` which is what we're intended to do?
+
+
+# Let's take a look at the routing first
+
+And clean it up while we're at it.
+
+This is what mine looks like now:
+
+~~~~
+@@@ ruby
+Testemail::Application.routes.draw do
+  get "alert_pages/sender"
+  get "alert_pages/thankyou"
+end
+~~~~
+
+Let's _not_ bother with setting up a `root` route. It's not necessary.
+
+## And `rake routes` just for fun
+
+~~~~
+@@@ sh
+  alert_pages_sender GET /alert_pages/sender(.:format)   alert_pages#sender
+alert_pages_thankyou GET /alert_pages/thankyou(.:format) alert_pages#thankyou
+~~~~
+
+We're going to use these later.
+
+
+
+# Web pages supporting email
+
+* Sender page
+* Thank you page
+* Helpers
+
+# Sender page
+
+This is the page where the user clicks to get an email sent. 
+
+We're going to test for the link to send the email.
+
+Add the following to `spec/views/alert_pages/sender.html.haml_spec.rb`:
+
+~~~~
+@@@ ruby
+
+require 'spec_helper'
+describe "alert_pages/sender" do
+  it "has a send link on the page for sending email" do    
+    render    
+    rendered.should have_selector('a')
+  end
+end
+~~~~
+
+## Make it pass
+
+~~~~
+@@@ haml
+%h1 AlertPages#sender
+%p Find me in app/views/alert_pages/sender.html.haml
+%p
+  %a.alert-email{ :href => "#" } Send email
+~~~~
+
+# Thank you page
+
+Add to `cat spec/views/alert_pages/thankyou.html.haml_spec.rb`:
+~~~~
+@@@ ruby 
+require 'spec_helper'
+
+describe "alert_pages/thankyou.html.haml" do
+  it "thanks the user for sending him or herself email" do
+    render
+    rendered.should =~ /thank you/i
+  end
+end
+~~~~
+
+### `rspec spec` is red
+
+## Go green
+
+Add the following to `app/views/alert_pages/thankyou.html.haml`:
+
+~~~~
+@@@ haml
+%h1 AlertPages#thankyou
+%p Find me in app/views/alert_pages/thankyou.html.haml
+%p Thank you for sending yourself email
+%a { :href => alert_pages_sender_path }
+~~~~
+
+
+# Pages helper
+
+~~~~
+@@@ ruby
+spec/helpers/alert_pages_helper_spec.rb 
+require 'spec_helper'
+
+describe AlertPagesHelper do
+  it "provides a small footer element" do
+    helper.footer_small.should =~ /small/
+  end
+end
+~~~~
+
+## And the implementation
+
+~~~~
+@@@ ruby
+module AlertPagesHelper
+  def footer_small
+    'This is the small footer'  end
+end
+~~~~
+
+### Ok, that's kind of lame, I agree. But...
+
+But but but...
+
+The point is *testing first*.
+
+It's a habit, and it's not an easy habit to create. 
+
+If it were easy, everyone would do it.
+
+# Do we even need a helper?
+
+Maybe, maybe not.
+
+Once you start thinking about split testing user behavior,
+you need to think about how your code will support split testing.
+
+At that point, helpers start to make a lot more sense.
+
+
+# Controller specs
 
 
 # Getting some help with specs
@@ -213,6 +368,34 @@ end
 
 Now we add in some of the handy spec with matchers from `email_spec` gem.
 
+Add more to `spec/mailers/alert_mailer_spec.rb`:
+~~~~
+@@@ ruby
+require "spec_helper"
+
+describe AlertMailer do
+  describe "pop" do
+    # you already have this...
+  end
+
+  # from https://github.com/bmabey/email-spec
+  before(:all) do
+    @email = AlertMailer.pop
+  end
+
+  it "should be set to be delivered to the email passed in" do
+    @email.should deliver_to("youremail@addresshere.com")
+  end
+
+  it "should contain the user's message in the mail body" do
+    @email.should have_body_text(/Hi/)
+  end
+
+  it "should have the correct subject" do
+    @email.should have_subject(/Pop/)
+  end
+end
+~~~~
 
 # Sending email
 
@@ -325,35 +508,21 @@ There are an countable infinity of ways to configure email systems.
   621  sudo port install mail
   622  sudo port install postfix
   623  sudo port uninstall postfix
-  624  sudo port uninstall postfix @2.8.5_0
-  625  sudo port uninstall postfix @2.8.7_0
-  626  sudo port uninstall postfix
   627  tail -f /var/log/mail.log
   628  date | mail -s test david.doolin@gmail.com
   629  tail -f /var/log/mail.log
-  630* 
-  631  tail -f /var/log/mail.log
-  632  tail -f /var/log/mail.log
-  633  tail -f /var/log/mail.log
-  634  tail -f /var/log/mail.log
   635  less /etc/postfix/main.cf
   636  sudo postfix stop
   637  sudo postfix start
   638  date | mail -s test david.doolin@gmail.com
   639  telnet localhost 25
-  640  telnet localhost 25
-  641  telnet localhost 25
-  642  less /System/Library/LaunchDaemons/org.postfix.master.plist 
-  643  sudo /System/Library/LaunchDaemons/org.postfix.master.plist
   644  sudo less /System/Library/LaunchDaemons/org.postfix.master.plist
   645  sudo /bin/launchctl unload -w /System/Library/LaunchDaemons/org.postfix.master.plist
   646  tail -f /var/log/mail.log
   647  sudo port install postfix
   648  sudo port unload postfix
   649  tail -f /var/log/mail.log
-  650  tail -f /var/log/mail.log
   651  sudo /bin/launchctl load -w /System/Library/LaunchDaemons/org.postfix.master.plist
   652  tail -f /var/log/mail.log
   653  date | mail -s test david.doolin@gmail.com
-  654  history
 ~~~~

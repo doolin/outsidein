@@ -91,7 +91,7 @@ What we want a new application on the `celadon cedar` stack.
 
 Do it like this:
 
-`heroku apps:create --stack cedar`
+`$ heroku apps:create --stack cedar`
 
 New we can push to heroku: 
 
@@ -157,23 +157,27 @@ describe AlertMailer do
 end
 ~~~~
 
-Those parameters aren't useful. We want this emailer to actually work. I'm going to use my real email address for testing it out. You should use your own.
+Those parameters aren't useful. We want this emailer to actually work. I'm going
+to use my real email address for testing it out. You should use your own.
 
 
 # Controlling delivery
 
 ~~~~
 @@@ sh
-$ rails generate controller AlertEmailer sender
-      create  app/controllers/alert_emailer_controller.rb
-       route  get "alert_emailer/send"
+$ rails generate controller AlertEmailer sender thankyou
+     create  app/controllers/alert_emailer_controller.rb
+       route  get "alert_emailer/thankyou"
+       route  get "alert_emailer/sender"
       invoke  haml
       create    app/views/alert_emailer
-      create    app/views/alert_emailer/send.html.haml
+      create    app/views/alert_emailer/sender.html.haml
+      create    app/views/alert_emailer/thankyou.html.haml
       invoke  rspec
       create    spec/controllers/alert_emailer_controller_spec.rb
       create    spec/views/alert_emailer
-      create    spec/views/alert_emailer/send.html.haml_spec.rb
+      create    spec/views/alert_emailer/sender.html.haml_spec.rb
+      create    spec/views/alert_emailer/thankyou.html.haml_spec.rb
       invoke  helper
       create    app/helpers/alert_emailer_helper.rb
       invoke    rspec
@@ -185,12 +189,15 @@ $ rails generate controller AlertEmailer sender
       create      app/assets/stylesheets/alert_emailer.css.scss
 ~~~~
 
-## Bonus: why not `send` instead of `sender`
+## Bonus: why not `send` instead of `sender`?
 
 
 
 
 # Getting some help with specs
+
+Using the handy [email_spec](https://github.com/bmabey/email-spec) gem,
+put the following into `spec/spec_helper.rb`:
 
 ~~~~
 @@@ ruby
@@ -201,6 +208,10 @@ RSpec.configure do |config|
   config.include(EmailSpec::Matchers)
 end
 ~~~~
+
+# Getting down and dirty with email specs...
+
+Now we add in some of the handy spec with matchers from `email_spec` gem.
 
 
 # Sending email
@@ -236,9 +247,24 @@ attempting to get all the pieces of the puzzle fit together properly.
 
 # Going live with email
 
+
 Up until now, we've been speccing out without having to actually run an email server. We've just had Rails doing it's Rails thing, and that's a good thing.
 
 But now we make these emails actually get to where we want them.
+
+1. localhost with postfix
+2. personal Sendgrid account for development
+3. Heroku managed Sendgrid account for production
+
+Here's the command:
+
+`heroku addons:add sendgrid:starter`
+
+It should be possible to use the heroku managed Sendgrid locally on development. We'll check that out later using the heroku configuration command `heroku config`. Might even work for testing.
+
+# Configure application email
+
+Using the Sendgrid guidelines, emplace the following code into `config/environment.rb`:
 
 ~~~~
 @@@ ruby

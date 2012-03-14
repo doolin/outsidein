@@ -3,10 +3,25 @@
 
 Cucumber is a great weapon in the arsenal of any web developer.  
 
-Unfortunately, in mid-November 2010, most of the documentation for setting up Cucumber with Rails is for Rails 2 instead of Rails 3.  
+Unfortunately, in mid-November 2010 (when this material was first written),
+most of the documentation for setting up Cucumber with Rails is for Rails 2 instead of Rails 3.  
+
+This article helps fix a little bit of that.
 
 
-This article helps fix a little bit of that...
+#### Disclaimer
+
+Best Practice in Cucumber has evolved considerably since
+this article was first written. 
+
+Just to be clear, the purpose of the exercise here is:
+
+1. Demonstrate what the Outside-In cycle looks like
+1. Demonstrate approximately how test-first is implemented
+
+Again: nothing in this presentation should be construed
+as a BDD Best Practice.
+
 
 # From scratch
 
@@ -23,6 +38,7 @@ Here, we have a user adding a new book title to a list of book titles. That's al
 I'm using the following setup:
 
  * ruby 1.9.3-p0
+  * `rvm use 1.9.3@outsidein`
  * rails 3.2.1
  * Gemfile to follow...
  
@@ -34,6 +50,7 @@ First up, create your new Rails code:
 @@@ sh
 $ rails new outsidein
 $ cd outsidein
+$ rm public/index.html
 ~~~~
 
 ## OpenSSL error
@@ -71,6 +88,7 @@ group :test, :development do
   gem 'cucumber-rails'
   gem 'database_cleaner'
   gem 'rspec'
+  gem 'spork' #optional
 end
 ~~~~
 
@@ -206,6 +224,10 @@ Solution: Add <code>resources :books</code> to <code>config/routes.rb</code>.
 While we're at it, go ahead and add a root path, this will be helpful 
 later: `root :to => 'books#index'`.
 
+## Important: If you're running Spork...
+
+If you're running Spork, you will need to restart rails to 
+acquire the reconfigured routes.
 
 # A route wants a controller...
 
@@ -452,7 +474,7 @@ let's go ahead and redirect this to the root_path for now:
 ~~~~
 @@@ ruby
 def create
-  redirect_to books_path       
+  redirect_to root_path
 end
 ~~~~
 
@@ -542,7 +564,7 @@ Time to fill in for the next step, this time with a matcher:
 ~~~~
 @@@ ruby
 Then /^I should see "([^"]*)"$/ do |arg1|
-  page.should have_text(arg1)
+  page.should have_content(arg1)
 end
 ~~~~
 

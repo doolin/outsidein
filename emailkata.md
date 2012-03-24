@@ -1,5 +1,13 @@
 # An Email Code Kata for Rails
 
+# 50,000 foot view
+
+What we need:
+
+* A `Mailer` (which is like a model)
+* Email template (the view)
+* An implementation, how the emails get sent.
+
 # Some background
 
 Sending emails from Rails isn't difficult, just takes a little practice to figure out and get working. 
@@ -465,6 +473,21 @@ ActionMailer::Base.smtp_settings = {
 If you use the environment variables `SENDGRID_USERNAME` and `SENDGRID_PASSWORD`, you will be able to leverage Heroku's automatically set environment variables. This is convenient for a number of reasons, mainly because it's convenient.
 
 
+
+# Checklist
+
+In approximate order of implementation:
+
+1. App a spec for the mailer template file.
+1. Add the email template to  `/app/mailers`.
+
+For simple testing:
+
+1. Add a view template spec checking for a link to an action which fires
+   an email.
+1. Add the view.
+1. Add a controller spec on that action
+1. Add the controller action.
 
 
 

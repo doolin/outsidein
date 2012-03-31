@@ -23,7 +23,7 @@ Again: nothing in this presentation should be construed
 as a BDD Best Practice.
 
 
-# From scratch
+# 1. From scratch
 
 This article and code is a from-scratch re-implementation of Sarah Mei's  <a href="http://www.sarahmei.com/blog/2010/05/29/outside-in-bdd/">Outside In BDD: How?</a> updated for Rails 3.  
 
@@ -33,7 +33,7 @@ But there are some differences.  Here, we start with a bare Rails application. T
 
 Here, we have a user adding a new book title to a list of book titles. That's all the information necessary to build out and test with Cucumber.
 
-## Assumptions
+## 2. Assumptions
 
 I'm using the following setup:
 
@@ -42,7 +42,7 @@ I'm using the following setup:
  * rails 3.2.1
  * Gemfile to follow...
  
-# Setting it up
+# 3. Setting it up
 
 First up, create your new Rails code:
 
@@ -53,7 +53,7 @@ $ cd outsidein
 $ rm public/index.html
 ~~~~
 
-## OpenSSL error
+## 4. OpenSSL error
 
 If bundler segfaults, this is most likely a
 problem with the `openssl` library which it 
@@ -63,7 +63,7 @@ For now, change the source argument from `https` to
 `http` in the Gemfile
 
 
-# Building the Gemfile
+# 5. Building the Gemfile
 
 Add <code>cucumber-rails</code>, `rspec` and <code>database_cleaner</code> 
 to <code>:development</code> and <code>:test</code> groups in your Gemfile:
@@ -92,7 +92,7 @@ group :test, :development do
 end
 ~~~~
 
-# Bundle it
+# 6. Bundle it
 
 As usual, run bundler:
 
@@ -112,7 +112,7 @@ $
 ~~~~
 
 
-# Set up Cucumber
+# 7. Set up Cucumber
         
 ~~~~
 @@@ sh
@@ -136,7 +136,7 @@ $
 
 At this point, we're about ready to write our application.
 
-# Step 1: Given I go to the new book page
+# 8. Step 1: Given I go to the new book page
 
 
 Let's create our first feature, <code>features/book.feature</code>:
@@ -153,7 +153,12 @@ Feature: User manages books
 ~~~~
 
 
-# We have no steps...
+### Caveat: This is feature is somewhat brittle!
+
+Current best practice deprecates features which 
+specify form filling.
+
+# 9. We have no steps...
 
 
 `$ cucumber`
@@ -185,7 +190,7 @@ end
 ~~~~
 
 
-# Add action to node...
+# 10. Add action to node...
 
 `$ cucumber`
 
@@ -213,7 +218,7 @@ end
 ~~~~
 
 
-# Routing helps...
+# 11. Routing helps...
 
 `$ cucumber`
 

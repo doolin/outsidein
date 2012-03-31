@@ -139,7 +139,7 @@ At this point, we're about ready to write our application.
 # Step 1: Given I go to the new book page
 
 
-Let's create our first feature, <code>features/book.feature</code>:
+Let's create our first feature. In <code>features/</code>, create a file called <code>book.feature</code>:
 
 ~~~~
 @@@ gherkin

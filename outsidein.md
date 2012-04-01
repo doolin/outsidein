@@ -30,10 +30,16 @@ This article and code is a from-scratch re-implementation of Sarah Mei's  <a hre
 
 But there are some differences.  Here, we start with a bare Rails application. The only generators we're going to use are for installing Cucumber.  Then, we'll drive the development one file and one method at a time. You will see lots of familiar error messages, along with exactly how those errors were fixed.
 
-
 Here, we have a user adding a new book title to a list of book titles. That's all the information necessary to build out and test with Cucumber.
 
-## 2. Assumptions
+### With a little help from your friends...
+
+Try this round robin-robin style with one or more friends. One person
+starts with the setup, pushes to github. Everyone else pulls to
+update, then leadeship passes to the next person, who implements
+the next step and pushes. Repeat until done.
+
+## Assumptions
 
 I'm using the following setup:
 
@@ -42,7 +48,7 @@ I'm using the following setup:
  * rails 3.2.1
  * Gemfile to follow...
  
-# 3. Setting it up
+# 2. Setting it up
 
 First up, create your new Rails code:
 
@@ -53,7 +59,7 @@ $ cd outsidein
 $ rm public/index.html
 ~~~~
 
-## 4. OpenSSL error
+## OpenSSL error
 
 If bundler segfaults, this is most likely a
 problem with the `openssl` library which it 
@@ -63,7 +69,7 @@ For now, change the source argument from `https` to
 `http` in the Gemfile
 
 
-# 5. Building the Gemfile
+# 3. Building the Gemfile
 
 Add <code>cucumber-rails</code>, `rspec` and <code>database_cleaner</code> 
 to <code>:development</code> and <code>:test</code> groups in your Gemfile:
@@ -92,7 +98,7 @@ group :test, :development do
 end
 ~~~~
 
-# 6. Bundle it
+# 4. Bundle it
 
 As usual, run bundler:
 
@@ -112,7 +118,7 @@ $
 ~~~~
 
 
-# 7. Set up Cucumber
+# 5. Set up Cucumber
         
 ~~~~
 @@@ sh
@@ -136,7 +142,7 @@ $
 
 At this point, we're about ready to write our application.
 
-# 8. Step 1: Given I go to the new book page
+# 6. Step 1: Given I go to the new book page
 
 
 Let's create our first feature. In <code>features/</code>, create a file called <code>book.feature</code>:
@@ -158,7 +164,7 @@ Feature: User manages books
 Current best practice deprecates features which 
 specify form filling.
 
-# 9. We have no steps...
+# 7. We have no steps...
 
 
 `$ cucumber`
@@ -190,7 +196,7 @@ end
 ~~~~
 
 
-# 10. Add action to node...
+# 8. Add action to node...
 
 `$ cucumber`
 
@@ -218,7 +224,7 @@ end
 ~~~~
 
 
-# 11. Routing helps...
+# 9. Routing helps...
 
 `$ cucumber`
 
@@ -234,7 +240,7 @@ later: `root :to => 'books#index'`.
 If you're running Spork, you will need to restart rails to 
 acquire the reconfigured routes.
 
-# A route wants a controller...
+# 10. A route wants a controller...
 
 `$ cucumber`
 
@@ -250,7 +256,7 @@ class BooksController < ApplicationController
 end
 ~~~~
 
-# And controllers want actions
+# 11. And controllers want actions
 
 `$ cucumber`
 
@@ -268,7 +274,7 @@ end
 ~~~~
 
 
-# Templates help too...
+# 13. Templates help too...
 
 
 `$ cucumber`
@@ -298,7 +304,7 @@ Passed!
 One down, four to go.  
 
 
-# Step 2: And I fill in "Name" with "War & Peace"
+# 14. Step 2: And I fill in "Name" with "War & Peace"
 
 
 Cucumber now fails on the second step:
@@ -325,7 +331,7 @@ end
 
 
 
-# Forms are very helpful
+# 15. Forms are very helpful
 
 `$ cucumber`
 
@@ -343,7 +349,7 @@ Solution: Add a form to the new book page:
 ~~~~
 
 
-# Rails is very unhappy
+# 16. Rails is very unhappy
 
 `$ cucumber`
 
@@ -360,7 +366,7 @@ Solution: Add instance variable to make Rails happy. <code>In app/controllers/bo
 ~~~~
 
 
-# Instances prefer objects
+# 17. Instances prefer objects
 
 `$ cucumber`
 
@@ -382,7 +388,7 @@ end
 ~~~~
 
 
-# Activate ActiveRecord
+# 18. Activate ActiveRecord
 
 `$ cucumber`
 
@@ -426,7 +432,7 @@ And run the migration:
 Running cucumber again, we pass.  Excellent.
 
 
-# Step 3: When I press "Create"
+# 19. Step 3: When I press "Create"
 
 
 `$ cucumber`
@@ -452,7 +458,7 @@ end
 
 
 
-# Controllers love actions
+# 20. Controllers love actions
 
 `$ cucumber`
 
@@ -467,7 +473,7 @@ end
 ~~~~
 
 
-# Another dang template
+# 21. Another dang template
 
 `$ cucumber`
 
@@ -484,7 +490,7 @@ end
 ~~~~
 
 
-# Handle the index action...
+# 22. Handle the index action...
 
 `$ cucumber`
 
@@ -499,7 +505,7 @@ end
 ~~~~
 
 
-# An index action wants for an index template
+# 23. An index action wants for an index template
 
 `$ cucumber`
 
@@ -519,7 +525,7 @@ Solution: Add app/views/books/index.html.erb:
 Step 3 now passes cucumber.  Onward, through the fog.
 
 
-# Step 4: Then I should be on the book list page
+# 24. Step 4: Then I should be on the book list page
 
 `$ cucumber`
 
@@ -549,7 +555,7 @@ And that passes Step 4.
 </dl>
 
 
-# Step 5: And I should see "War & Peace"
+# 25. Step 5: And I should see "War & Peace"
 
 
 
@@ -574,7 +580,7 @@ end
 ~~~~
 
 
-# Still not seeing any books
+# 26. Still not seeing any books
 
 `$ cucumber`
 
@@ -597,7 +603,7 @@ Now render the books:
 
 
 
-# Need an instance array of books
+# 27. Need an instance array of books
 
 `$ cucumber`
 
@@ -613,7 +619,7 @@ end
 ~~~~
 
 
-# Rendering a partial requires... a partial
+# 28. Rendering a partial requires... a partial
 
 `$ cucumber`
 
@@ -628,7 +634,7 @@ Solution: Add the partial <code>app/views/books/_book.html.erb</code>
 
 
 
-# Time to actually create the book...
+# 29. Time to actually create the book...
 
 `$ cucumber`
 
@@ -670,7 +676,7 @@ end
 ~~~~
 
 
-# Run it again to pass
+# 30. Run it again to pass
 
 `$ cucumber`
 

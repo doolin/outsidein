@@ -236,9 +236,11 @@ Let's _not_ bother with setting up a `root` route. It's not necessary.
 
 ~~~~
 @@@ sh
-  alert_pages_sender GET /alert_pages/sender(.:format)   alert_pages#sender
+alert_pages_sender GET /alert_pages/sender(.:format)   alert_pages#sender
+
 alert_pages_thankyou GET /alert_pages/thankyou(.:format) alert_pages#thankyou
 ~~~~
+
 
 We're going to use these later.
 
@@ -283,6 +285,7 @@ end
 # Thank you page
 
 Add to `cat spec/views/alert_pages/thankyou.html.haml_spec.rb`:
+
 ~~~~
 @@@ ruby 
 require 'spec_helper'
@@ -377,6 +380,7 @@ end
 Now we add in some of the handy spec with matchers from `email_spec` gem.
 
 Add more to `spec/mailers/alert_mailer_spec.rb`:
+
 ~~~~
 @@@ ruby
 require "spec_helper"
@@ -422,8 +426,6 @@ This is a huge pain and will result in hours of entertainment
 attempting to get all the pieces of the puzzle fit together properly.
 
 
-
-
 # Email text view (with haml)
 
 ~~~~
@@ -434,6 +436,29 @@ attempting to get all the pieces of the puzzle fit together properly.
 %p 
   #{@greeting}, find me in app/views/app/views/alert_mailer/pop.text.haml
 ~~~~
+
+
+# Before going live with email...
+
+Let's see what these emails look like in the browser first.
+
+We'll use the handy `letter_opener` gem
+
+~~~~
+@@@ ruby
+Stormsavvy::Application.configure do
+  # Settings here take precedence over config/application.rb
+  ...
+  config.action_mailer.delivery_method = :letter_opener
+  #config.action_mailer.delivery_method = :smtp
+  ...
+end
+~~~~
+
+## Cool fact!
+
+You don't have to be running Rails to use `letter_opener`.
+
 
 
 # Going live with email
@@ -493,14 +518,42 @@ For simple testing:
 
 # Troubleshooting
 
-There are an countable infinity of ways to configure email systems. 
+Setting up email has a number of moving parts. If you find yourself in a
+bind, check the following:
 
-
-* If you added Sendgrid via Heroku, ensure your environment variables are correct.
-
+* If you added Sendgrid via Heroku, ensure your environment variables are correct. 
+*This is really important when testing Rails localhost and rake*. (See
+note on rake below.)
 * Precompiling assets may be necessary.
-
 * `$ heroku logs` is your new best friend.
+
+## When `rake` breaks...
+
+
+It's really handy to run rake from the command line to test your emails,
+like so:
+
+~~~~
+@@@ sh
+$ rake dailynotice
+~~~~
+
+### IF...
+
+1. you're using SendGrid, and,
+2. you get a permission error...
+
+...ensure you have your shell variables set in the shell session where
+you are running rake:
+
+~~~~
+@@@ sh
+export SENDGRID_USERNAME=myname
+export SENDGRID_PASSWORD=mypass
+~~~~
+
+
+
 
 
 

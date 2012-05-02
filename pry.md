@@ -193,8 +193,21 @@ Let's try an example...
 a = 1/0
 ~~~~
 
-# Links
+# Python coolness
 
+Python has this cool feature in the interpreter which returns a little
+documentation about the object and method, when invoked without
+parentheses:
+
+~~~~
+@@@ python
+>>> file.read
+<built-in method read of file object at 0x1004c38b0>
+>>> file.read()
+'This is the contents of the file'
+~~~~
+
+# Links 
 You might find these links useful:
 
 * [Pry Github account](https://github.com/pry/pry)

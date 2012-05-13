@@ -32,7 +32,9 @@ Here is that practice, develped as a code kata.
 First, we need to set the stage:
 
 ~~~~
+@@@ bash
 $ rails new emailkata
+$ cd emailkata
 $ rm public/index.html
 ~~~~
 
@@ -130,6 +132,13 @@ $ rails generate mailer AlertMailer pop
       create    spec/fixtures/alert_mailer/pop
 ~~~~
 
+## RSpec it...
+
+~~~~
+@@@ sh
+$ rspec spec/mailers
+~~~~
+
 ### `git add .; git commit -m"generated mailer files"`
 
 
@@ -214,6 +223,30 @@ Note we invoked generate with `sender` argument:
 `$ rails generate controller AlertPages sender thankyou`
 
 Why not `send` which is what we're intended to do?
+
+# Run rspec
+
+~~~~
+@@@ ruby
+$ rspec spec
+..*..*
+
+Pending:
+  AlertPagesHelper add some examples to (or delete)
+/private/tmp/emailkata/spec/helpers/alert_pages_helper_spec.rb
+    # No reason given
+    # ./spec/helpers/alert_pages_helper_spec.rb:14
+  alert_pages/sender.html.haml add some examples to (or delete)
+/private/tmp/emailkata/spec/views/alert_pages/sender.html.haml_spec.rb
+    # No reason given
+    # ./spec/views/alert_pages/sender.html.haml_spec.rb:4
+  alert_pages/thankyou.html.haml add some examples to (or delete)
+/private/tmp/emailkata/spec/views/alert_pages/thankyou.html.haml_spec.rb
+    # No reason given
+    # ./spec/views/alert_pages/thankyou.html.haml_spec.rb:4
+
+Finished in 0.56446 seconds
+~~~~
 
 
 # Let's take a look at the routing first
@@ -333,7 +366,8 @@ end
 @@@ ruby
 module AlertPagesHelper
   def footer_small
-    'This is the small footer'  end
+    'This is the small footer'
+  end
 end
 ~~~~
 
@@ -359,6 +393,12 @@ At that point, helpers start to make a lot more sense.
 
 # Controller specs
 
+# We need to actually send emails...
+
+This requires:
+
+1. Invoking the `mail` method to acquire an email;
+2. Delivering that email.
 
 # Getting some help with specs
 
@@ -428,25 +468,31 @@ attempting to get all the pieces of the puzzle fit together properly.
 
 # Email text view (with haml)
 
+
+Check the email template, make sure it has something like this in
+`app/views/alert_mailer/pop.text.haml`:
+
 ~~~~
 @@@ haml
 %p
-  Your StormSavvy Alert
+  Your Email Alert
 
 %p 
   #{@greeting}, find me in app/views/app/views/alert_mailer/pop.text.haml
 ~~~~
 
 
+
 # Before going live with email...
 
 Let's see what these emails look like in the browser first.
 
-We'll use the handy `letter_opener` gem
+We'll use the handy `letter_opener` gem. Add the following to
+`config/environments/development.rb`:
 
 ~~~~
 @@@ ruby
-Stormsavvy::Application.configure do
+Emailkata::Application.configure do
   # Settings here take precedence over config/application.rb
   ...
   config.action_mailer.delivery_method = :letter_opener
@@ -463,7 +509,6 @@ You don't have to be running Rails to use `letter_opener`.
 
 # Going live with email
 
-
 Up until now, we've been speccing out without having to actually run an email server. We've just had Rails doing it's Rails thing, and that's a good thing.
 
 But now we make these emails actually get to where we want them.
@@ -476,7 +521,10 @@ Here's the command:
 
 `heroku addons:add sendgrid:starter`
 
-It should be possible to use the heroku managed Sendgrid locally on development. We'll check that out later using the heroku configuration command `heroku config`. Might even work for testing.
+It should be possible to use the heroku managed Sendgrid 
+locally on development. We'll check that out later using the 
+heroku configuration command `heroku config`. Might even work for testing.
+
 
 # Configure application email
 
@@ -495,7 +543,10 @@ ActionMailer::Base.smtp_settings = {
 }
 ~~~~
 
-If you use the environment variables `SENDGRID_USERNAME` and `SENDGRID_PASSWORD`, you will be able to leverage Heroku's automatically set environment variables. This is convenient for a number of reasons, mainly because it's convenient.
+If you use the environment variables `SENDGRID_USERNAME` 
+and `SENDGRID_PASSWORD`, you will be able to leverage 
+Heroku's automatically set environment variables. This is 
+convenient for a number of reasons, mainly because it's convenient.
 
 
 
@@ -551,9 +602,6 @@ you are running rake:
 export SENDGRID_USERNAME=myname
 export SENDGRID_PASSWORD=mypass
 ~~~~
-
-
-
 
 
 

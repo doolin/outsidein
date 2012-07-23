@@ -621,6 +621,17 @@ export SENDGRID_PASSWORD=mypass
 * http://highgroove.com/articles/2011/06/21/rspec-tip-let-and-nested-describe-context-blocks.html
 * http://eggsonbread.com/2010/03/28/my-rspec-best-practices-and-tips/
 
+- Action Mailer Screencast:
+  http://rubyonrails.org/screencasts/rails3/bundler-action-mailer 
+- Action Mailer Guide:
+  http://guides.rubyonrails.org/action_mailer_basics.html
+- Railscasts Screencast:
+  http://railscasts.com/episodes/206-action-mailer-in-rails-3/
+- Stanford Lectures:
+  http://openclassroom.stanford.edu/MainFolder/HomePage.php
+- Rails Apps Templates:
+  https://github.com/RailsApps/rails3-bootstrap-devise-cancan#readme
+
 
 # Postfix
 
